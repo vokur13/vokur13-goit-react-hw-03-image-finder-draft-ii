@@ -6,10 +6,6 @@ import { Box } from 'components/Box';
 import { Button } from 'components/Button';
 import { Searchbar } from 'components/Searchbar';
 import { ImageGalleryHub } from 'components/ImageGalleryHub';
-import { fetchGallery } from '../services/api';
-import { Loader } from 'components/Loader';
-import { ImageGallery } from 'components/ImageGallery';
-import { ImageGalleryError } from 'components/ImageGalleryError';
 
 export class App extends Component {
   state = {

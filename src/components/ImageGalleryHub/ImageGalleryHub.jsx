@@ -14,7 +14,6 @@ const Status = {
 
 export class ImageGalleryHub extends Component {
   state = {
-    //     page: null,
     gallery: [],
     error: false,
     length: null,
@@ -23,12 +22,10 @@ export class ImageGalleryHub extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { query, page } = this.props;
-    //     const { page } = this.state;
     if (prevProps.query !== query) {
       try {
         this.setState({
           status: Status.PENDING,
-          //   page: 1,
         });
         const data = await API.getGallery(query, page);
         const { totalHits, hits } = await data;
@@ -43,6 +40,23 @@ export class ImageGalleryHub extends Component {
           gallery: [...hits],
           length: hits.length,
         });
+      } catch (error) {
+        this.setState({ error: true, status: Status.REJECTED });
+        console.log(error);
+      }
+    }
+    if (prevProps.page !== page) {
+      try {
+        this.setState({
+          status: Status.PENDING,
+        });
+        const data = await API.getGallery(query, page);
+        const { totalHits, hits } = await data;
+        this.setState(prevState => ({
+          status: Status.RESOLVED,
+          gallery: [...prevState.gallery, ...hits],
+          length: hits.length,
+        }));
       } catch (error) {
         this.setState({ error: true, status: Status.REJECTED });
         console.log(error);
