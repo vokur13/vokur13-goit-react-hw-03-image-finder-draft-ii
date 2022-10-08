@@ -2,8 +2,8 @@ import axios from 'axios';
 
 axios.defaults.baseURL = 'https://pixabay.com/api';
 
-// const API_KEY = '29248542-cea93977a5234fa0e2d1b3dfd';
-const API_KEY = '248542-cea93977a5234fa0e2d1b3dfd';
+const API_KEY = '29248542-cea93977a5234fa0e2d1b3dfd';
+// const API_KEY = '248542-cea93977a5234fa0e2d1b3dfd';
 
 export const getGallery = async (query, page) => {
   const response = await axios.get(

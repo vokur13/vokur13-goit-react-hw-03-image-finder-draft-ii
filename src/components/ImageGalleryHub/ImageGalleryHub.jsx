@@ -1,16 +1,24 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
 import * as API from 'services/api';
-// import { ImageGallery } from 'components/ImageGallery';
-import { Loader } from 'components/Loader';
+import { ImageGalleryError } from 'components/ImageGalleryError';
+import { ImageGallery } from 'components/ImageGallery';
+import { ImageGalleryPending } from 'components/ImageGalleryPending';
+
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
 
 export class ImageGalleryHub extends Component {
   state = {
     page: null,
     gallery: [],
-    loader: false,
     error: false,
-    length: 12,
+    length: null,
+    status: Status.IDLE,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -18,35 +26,48 @@ export class ImageGalleryHub extends Component {
     const { page } = this.state;
     if (prevProps.query !== query) {
       try {
-        this.setState({ page: 1, loader: true, gallery: [] });
+        this.setState({
+          status: Status.PENDING,
+          page: 1,
+        });
         const data = await API.getGallery(query, page);
         const { totalHits, hits } = await data;
+        if (hits.length === 0) {
+          this.setState({ status: Status.REJECTED });
+          return toast.error(
+            `Whoops, something went wrong, no item upon query '${query}' found`
+          );
+        }
         this.setState({
+          status: Status.RESOLVED,
           gallery: [...hits],
-          loader: false,
           length: hits.length,
         });
       } catch (error) {
-        this.setState({ error: true, loader: false });
+        this.setState({ error: true, status: Status.REJECTED });
         console.log(error);
       }
     }
   }
 
   render() {
-    const { query } = this.props;
-    const { gallery, loader, error, length } = this.state;
-    return (
-      <>
-        {!length && (
-          <p>Whoops, something went wrong, no item upon query {query} found</p>
-        )}
-        {error && <p>Whoops, something went wrong: {error.message}</p>}
-        {loader && <Loader />}
-        {!query && <div>Please let us know your query item</div>}
-        {gallery.length > 0 ? <div>{gallery[0].tags}</div> : null}
-      </>
-    );
+    const { gallery, error, status } = this.state;
+
+    if (status === 'idle') {
+      return <div>Please let us know your query item</div>;
+    }
+
+    if (status === 'pending') {
+      return <ImageGalleryPending />;
+    }
+
+    if (status === 'rejected') {
+      return <ImageGalleryError message={error.message} />;
+    }
+
+    if (status === 'resolved') {
+      return <ImageGallery data={gallery} />;
+    }
   }
 }
 

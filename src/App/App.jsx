@@ -30,7 +30,7 @@ export class App extends Component {
       <>
         <Searchbar onSubmit={this.handleFormSubmit} />
         <ImageGalleryHub query={query} />
-        <ToastContainer position="top-left" autoClose={3000} />
+        <ToastContainer position="top-left" autoClose={5000} />
       </>
     );
   }
