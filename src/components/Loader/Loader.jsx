@@ -4,8 +4,8 @@ export const Loader = () => {
   return (
     <>
       <Grid
-        height="80"
-        width="80"
+        height="120"
+        width="120"
         color="#4fa94d"
         ariaLabel="grid-loading"
         radius="12.5"

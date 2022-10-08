@@ -14,7 +14,7 @@ const Status = {
 
 export class ImageGalleryHub extends Component {
   state = {
-    page: null,
+    //     page: null,
     gallery: [],
     error: false,
     length: null,
@@ -22,13 +22,13 @@ export class ImageGalleryHub extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { query } = this.props;
-    const { page } = this.state;
+    const { query, page } = this.props;
+    //     const { page } = this.state;
     if (prevProps.query !== query) {
       try {
         this.setState({
           status: Status.PENDING,
-          page: 1,
+          //   page: 1,
         });
         const data = await API.getGallery(query, page);
         const { totalHits, hits } = await data;
@@ -51,6 +51,7 @@ export class ImageGalleryHub extends Component {
   }
 
   render() {
+    const { query } = this.props;
     const { gallery, error, status } = this.state;
 
     if (status === 'idle') {
@@ -58,7 +59,7 @@ export class ImageGalleryHub extends Component {
     }
 
     if (status === 'pending') {
-      return <ImageGalleryPending />;
+      return <ImageGalleryPending query={query} data={gallery} />;
     }
 
     if (status === 'rejected') {
