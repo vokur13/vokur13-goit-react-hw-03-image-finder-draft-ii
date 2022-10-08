@@ -1,4 +1,6 @@
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+// import { ReactComponent as MyIcon } from './.svg';
 import { Formik } from 'formik';
 import { Box } from 'components/Box';
 import { SearchForm, Input, SearchFormButton, Error } from './Searchbar.styled';
@@ -6,12 +8,12 @@ import * as yup from 'yup';
 import { ImSearch } from 'react-icons/im';
 
 let schema = yup.object().shape({
-  login: yup.string(),
+  query: yup.string(),
 });
 
 export const Searchbar = ({ onSubmit }) => {
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    await onSubmit(values);
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    onSubmit(values);
     setSubmitting(false);
     resetForm();
   };
@@ -49,7 +51,7 @@ export const Searchbar = ({ onSubmit }) => {
               autoComplete="off"
               autoFocus
               name="query"
-              required
+              //       required
               placeholder="Search images and photos"
             />
             <Error component="div" name="query" />
