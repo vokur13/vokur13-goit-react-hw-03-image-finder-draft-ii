@@ -19,7 +19,7 @@ export class App extends Component {
   handleFormSubmit = ({ query }) => {
     const q = query.trim().toLowerCase();
     if (q === '') {
-      return toast.warn('Please let us know yuor query item');
+      return toast.warn('Please let us know your query item');
     }
     this.setState({ query: q });
   };
