@@ -14,7 +14,7 @@ import { ImageGalleryError } from 'components/ImageGalleryError';
 export class App extends Component {
   state = {
     query: '',
-    page: null,
+    page: 1,
   };
 
   handleFormSubmit = ({ query }) => {
@@ -25,12 +25,22 @@ export class App extends Component {
     this.setState({ query: q });
   };
 
+  handleMoreImage = () => {
+    console.log('Handle More Image');
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
   render() {
     const { query, page } = this.state;
     return (
       <>
         <Searchbar onSubmit={this.handleFormSubmit} />
         <ImageGalleryHub query={query} page={page} />
+        <Box display="flex" justifyContent="center">
+          <Button type="button" onClick={this.handleMoreImage}>
+            Load more
+          </Button>
+        </Box>
         <ToastContainer position="top-left" autoClose={5000} />
       </>
     );
