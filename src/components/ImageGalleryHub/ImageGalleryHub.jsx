@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import * as API from 'services/api';
 import { Box } from 'components/Box';
@@ -24,8 +25,9 @@ export class ImageGalleryHub extends Component {
     gallery: [],
     page: this.props.initialValue,
     error: false,
-    length: null,
     status: Status.IDLE,
+    total: null,
+    totalHits: null,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -35,19 +37,25 @@ export class ImageGalleryHub extends Component {
       try {
         this.setState({
           status: Status.PENDING,
+          page: this.props.initialValue,
+          gallery: [],
+          total: null,
+          totalHits: null,
         });
         const data = await API.getGallery(query, page);
         const { totalHits, hits } = await data;
         if (hits.length === 0) {
           this.setState({ status: Status.REJECTED });
           return toast.error(
-            `Whoops, something went wrong, no item upon query '${query}' found`
+            `Sorry, there are no images matching your search query for '${query}'. Please try again.`
           );
         }
+        toast.success(`Hooray! We found ${totalHits} images.`);
         this.setState({
           status: Status.RESOLVED,
           gallery: [...hits],
-          length: hits.length,
+          total: hits.length,
+          totalHits: totalHits,
         });
       } catch (error) {
         this.setState({ error: true, status: Status.REJECTED });
@@ -59,13 +67,18 @@ export class ImageGalleryHub extends Component {
         this.setState({
           status: Status.PENDING,
         });
-        const data = await API.getGallery(query, page);
-        const { totalHits, hits } = await data;
+        const { hits } = await API.getGallery(query, page);
+
         this.setState(prevState => ({
           status: Status.RESOLVED,
           gallery: [...prevState.gallery, ...hits],
-          length: hits.length,
+          total: prevState.total + hits.length,
         }));
+        // if (total === totalHits) {
+        //   return toast.warn(
+        //     "We're sorry, but you've reached the end of search results."
+        //   );
+        // }
       } catch (error) {
         this.setState({ error: true, status: Status.REJECTED });
         console.log(error);
@@ -73,13 +86,16 @@ export class ImageGalleryHub extends Component {
     }
   }
 
-  handleMoreImage = async () => {
-    this.setState(prevState => ({ page: prevState.page + this.props.step }));
+  handleMoreImage = () => {
+    const { step } = this.props;
+    this.setState(prevState => ({
+      page: prevState.page + step,
+    }));
   };
 
   render() {
     const { query } = this.props;
-    const { gallery, error, status } = this.state;
+    const { gallery, error, status, total, totalHits } = this.state;
 
     if (status === 'idle') {
       return <div>Please let us know your query item</div>;
@@ -97,16 +113,27 @@ export class ImageGalleryHub extends Component {
       return (
         <>
           <ImageGallery data={gallery} />;
-          <Box display="flex" justifyContent="center">
-            <Button type="button" onClick={this.handleMoreImage}>
-              Load more
-            </Button>
-          </Box>
+          {total < totalHits ? (
+            <Box display="flex" justifyContent="center">
+              <Button type="button" onClick={this.handleMoreImage}>
+                Load more
+              </Button>
+            </Box>
+          ) : null}
+          {total === totalHits
+            ? toast.warn(
+                "We're sorry, but you've reached the end of search results."
+              )
+            : null}
         </>
       );
     }
   }
 }
+
+ImageGalleryHub.propTypes = {
+  query: PropTypes.string,
+};
 
 {
   /* <p>Whoops, something went wrong, no item upon query {query} found</p> */

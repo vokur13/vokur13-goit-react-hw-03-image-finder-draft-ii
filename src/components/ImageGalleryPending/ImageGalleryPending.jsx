@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import { Loader } from 'components/Loader';
 import { ImageGallery } from 'components/ImageGallery';
 import { Box } from 'components/Box';
 
-export const ImageGalleryPending = ({ query, gallery }) => {
+export const ImageGalleryPending = ({ query }) => {
   const item = {
     query: query,
     gallery: [],
@@ -14,8 +15,8 @@ export const ImageGalleryPending = ({ query, gallery }) => {
         m={0}
         position="absolute"
         top="50%"
-        left="50%"
-        transform="translate(-50%, -50%)"
+        left="45%"
+        // transform="translate(-50%, -50%)"
       >
         <Loader />
       </Box>
@@ -23,4 +24,8 @@ export const ImageGalleryPending = ({ query, gallery }) => {
       <ImageGallery data={item.gallery} />
     </div>
   );
+};
+
+ImageGalleryPending.propTypes = {
+  query: PropTypes.string,
 };

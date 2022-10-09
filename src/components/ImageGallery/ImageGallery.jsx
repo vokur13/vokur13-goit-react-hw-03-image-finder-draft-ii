@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { ImageGalleryItem } from 'components/ImageGalleryItem';
 import { ImageGalleryList } from './ImageGallery.styled';
 import { Box } from 'components/Box';
@@ -12,4 +13,8 @@ export const ImageGallery = ({ data, ...otherProps }) => {
       </ImageGalleryList>
     </Box>
   );
+};
+
+ImageGallery.propTypes = {
+  data: PropTypes.array,
 };
