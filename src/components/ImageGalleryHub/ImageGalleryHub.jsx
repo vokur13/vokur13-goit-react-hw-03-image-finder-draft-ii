@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import * as API from 'services/api';
 import { Box } from 'components/Box';
@@ -18,12 +18,12 @@ const Status = {
 export class ImageGalleryHub extends Component {
   static defaultProps = {
     step: 1,
-    initialValue: 1,
   };
 
   state = {
+    query: this.props.query,
+    page: this.props.page,
     gallery: [],
-    page: this.props.initialValue,
     error: false,
     status: Status.IDLE,
     total: null,
@@ -31,59 +31,55 @@ export class ImageGalleryHub extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { query } = this.props;
-    const { page } = this.state;
-    if (prevProps.query !== query) {
-      try {
-        this.setState({
-          status: Status.PENDING,
-          page: this.props.initialValue,
-          gallery: [],
-          total: null,
-          totalHits: null,
-        });
-        const data = await API.getGallery(query, page);
-        const { totalHits, hits } = await data;
-        if (hits.length === 0) {
-          this.setState({ status: Status.REJECTED });
-          return toast.error(
-            `Sorry, there are no images matching your search query for '${query}'. Please try again.`
-          );
-        }
-        toast.success(`Hooray! We found ${totalHits} images.`);
-        this.setState({
-          status: Status.RESOLVED,
-          gallery: [...hits],
-          total: hits.length,
-          totalHits: totalHits,
-        });
-      } catch (error) {
-        this.setState({ error: true, status: Status.REJECTED });
-        console.log(error);
+    const { query, page } = this.state;
+    try {
+      this.setState({
+        status: Status.PENDING,
+        //   page: this.props.initialValue,
+        gallery: [],
+        total: null,
+        totalHits: null,
+      });
+      const { totalHits, hits } = await API.getGallery(query, page);
+      if (hits.length === 0) {
+        this.setState({ status: Status.REJECTED });
+        return toast.error(
+          `Sorry, there are no images matching your search query for '${query}'. Please try again.`
+        );
       }
+      toast.success(`Hooray! We found ${totalHits} images.`);
+      this.setState({
+        status: Status.RESOLVED,
+        gallery: [...hits],
+        total: hits.length,
+        totalHits: totalHits,
+      });
+    } catch (error) {
+      this.setState({ error: true, status: Status.REJECTED });
+      console.log(error);
     }
-    if (prevState.page !== page) {
-      try {
-        this.setState({
-          status: Status.PENDING,
-        });
-        const { hits } = await API.getGallery(query, page);
+    //     if (prevState.page !== page) {
+    //       try {
+    //         this.setState({
+    //           status: Status.PENDING,
+    //         });
+    //         const { hits } = await API.getGallery(query, page);
 
-        this.setState(prevState => ({
-          status: Status.RESOLVED,
-          gallery: [...prevState.gallery, ...hits],
-          total: prevState.total + hits.length,
-        }));
-        // if (total === totalHits) {
-        //   return toast.warn(
-        //     "We're sorry, but you've reached the end of search results."
-        //   );
-        // }
-      } catch (error) {
-        this.setState({ error: true, status: Status.REJECTED });
-        console.log(error);
-      }
-    }
+    //         this.setState(prevState => ({
+    //           status: Status.RESOLVED,
+    //           gallery: [...prevState.gallery, ...hits],
+    //           total: prevState.total + hits.length,
+    //         }));
+    //         // if (total === totalHits) {
+    //         //   return toast.warn(
+    //         //     "We're sorry, but you've reached the end of search results."
+    //         //   );
+    //         // }
+    //       } catch (error) {
+    //         this.setState({ error: true, status: Status.REJECTED });
+    //         console.log(error);
+    //       }
+    //     }
   }
 
   handleMoreImage = () => {
@@ -131,9 +127,10 @@ export class ImageGalleryHub extends Component {
   }
 }
 
-ImageGalleryHub.propTypes = {
-  query: PropTypes.string,
-};
+// ImageGalleryHub.propTypes = {
+//   query: PropTypes.string,
+//   page: PropTypes.number.isRequired,
+// };
 
 {
   /* <p>Whoops, something went wrong, no item upon query {query} found</p> */
